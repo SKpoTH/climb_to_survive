@@ -1,5 +1,5 @@
 import arcade
-from models import World
+from world import World
 
 SCREEN_HEIGHT = 600
 SCREEN_WIDTH = 900
@@ -22,11 +22,17 @@ class PillSurWindow(arcade.Window):
         self.world.pillar3.draw()
         self.world.pillar4.draw()
         self.world.pillar5.draw()
-        
+
         self.world.human_main.draw()
         
         for spider in self.world.spider_list:
             spider.draw()
+
+        for spider_hit in self.world.spider_hit_list:
+            spider_hit.draw()
+
+        for rock in self.world.rock_list:
+            rock.draw()
 
     def update(self, delta):
         self.world.update(delta)
