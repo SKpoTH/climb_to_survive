@@ -17,7 +17,7 @@ SPIDER_HIT_SCALE = 0.2
 
 SPAWN_TIME = 1.0
 
-ROCK_SCALE = 0.05
+ROCK_SCALE = 0.1
 
 class World:
     def __init__(self, width, height):
