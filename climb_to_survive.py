@@ -1,4 +1,5 @@
 import arcade
+import pyglet
 from world import World
 
 SCREEN_HEIGHT = 600
@@ -24,15 +25,16 @@ class PillSurWindow(arcade.Window):
         self.world.pillar5.draw()
 
         self.world.human_main.draw()
+        self.world.human_main_hit.draw()
         
         for spider in self.world.spider_list:
             spider.draw()
 
-        for spider_hit in self.world.spider_hit_list:
-            spider_hit.draw()
-
         for rock in self.world.rock_list:
             rock.draw()
+
+        show_score = 'Score: ' + str(self.world.score)
+        arcade.draw_text(show_score, 10, SCREEN_HEIGHT-20, arcade.color.BLACK, 16)
 
     def update(self, delta):
         self.world.update(delta)

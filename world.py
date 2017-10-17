@@ -1,10 +1,11 @@
 import arcade
-from random import randint
-from models import Human, Pillar, Spider_Enemy, Spider_Enemy_Hit, Rock
+from random import randint, sample
+from models import Human, Pillar, Spider_Enemy, Get_Hit, Rock, Bird_Enemy
 
+'''
 SCREEN_HEIGHT = 600
 SCREEN_WIDTH = 900
-
+'''
 HUMAN_MOVE_LENGTH = 5
 PILLAR_FARTHUR = 150 #the Range between a pillar to a pillar
 SPIDER_MOVE = 2
@@ -13,17 +14,19 @@ PILLAR_SCALE = 0.6
 HUMAN_SCALE = 0.3
 
 SPIDER_SCALE = 0.3
-SPIDER_HIT_SCALE = 0.2
+HIT_SCALE = 0.3
 
-SPAWN_TIME = 1.0
+ROCK_SCALE = 0.15
 
-ROCK_SCALE = 0.1
+TIME_SCORE = 0.2
 
 class World:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.wait = 0
+        self.wait_bird_spawn = 0
+        self.wait_spider_spawn = 0
+        self.wait_time_score = 0
         
         self.pillar1 = Pillar('images/pillar.png', PILLAR_SCALE)
         self.pillar1.setup(self, PILLAR_FARTHUR*1, 0)
@@ -42,56 +45,69 @@ class World:
 
         self.human_main = Human('images/human_climbing.png', HUMAN_SCALE)
         self.human_main.setup(self, PILLAR_FARTHUR*3, height/2)
+        self.human_main_hit = Get_Hit('images/spider_enemy_hitblock.png', HIT_SCALE)
 
         self.spider_list = []
-        self.spider_hit_list = []
 
         self.rock_list = []
 
+        self.bird_list = []
+
+        self.SPIDER_SPAWN_TIME = 1.0
+        self.BIRD_SPAWN_TIME = 1.0
+
+        self.score = 0
+
     def update(self, delta):
         self.human_main.update(delta)
+        self.human_main_hit.setup(self, self.human_main.center_x, self.human_main.center_y)
      
-        self.wait += delta
-        if self.wait >= SPAWN_TIME:
+        self.wait_spider_spawn += delta
+        if self.wait_spider_spawn >= self.SPIDER_SPAWN_TIME:
             self.spider = Spider_Enemy('images/spider_enemy.png', SPIDER_SCALE)
             self.spider.setup(self, PILLAR_FARTHUR*randint(1,5), self.height)
             
             self.spider_list.append(self.spider)
-
-            self.spider_hit = Spider_Enemy_Hit('images/spider_enemy_hitblock.png', SPIDER_HIT_SCALE)
-            self.spider_hit.setup(self, self.spider.center_x, self.spider.center_y)
-
-            self.spider_hit_list.append(self.spider_hit)
             
-            self.wait -= SPAWN_TIME
+            self.wait_spider_spawn -= self.SPIDER_SPAWN_TIME
+            self.SPIDER_SPAWN_TIME = 0.5*randint(1,5)
+
+        self.wait_bird_spawn += delta
+        if self.wait_bird_spawn >= self.BIRD_SPAWN_TIME:
+            self.bird = Bird_Enemy('images/spider_enemy.png', SPIDER_SCALE)
+            self.bird.setup(self, 0, randint(0,self.height))
+            
+            self.bird_list.append(self.bird)
+            
+            self.wait_bird_spawn -= self.BIRD_SPAWN_TIME
+            self.BIRD_SPAWN_TIME = 0.5*randint(1,5)
+
         
-        for spider_hit in self.spider_hit_list:
-            spider_hit.center_y -= SPIDER_MOVE
-
-            for rock in self.rock_list:
-                rock.update(delta)
-                if rock.center_x <= 0 or rock.center_y <= 0 or rock.center_x >= self.width or rock.center_y >= self.height:
-                    self.rock_list.remove(rock)
-                if arcade.geometry.check_for_collision(spider_hit,rock):
-                    self.rock_list.remove(rock)
-                    self.spider_hit_list.remove(spider_hit)
-
-            if spider_hit.center_y <= 0:
-                self.spider_hit_list.remove(spider_hit)
-
-            if arcade.geometry.check_for_collision(spider_hit,self.human_main):
-                arcade.window_commands.close_window()
-
-        for spider in self.spider_list:
-            spider.update(delta)
-            if spider.center_y <= 0:
-                self.spider_list.remove(spider)
+        self.wait_time_score += delta
+        if self.wait_time_score >= TIME_SCORE:
+            self.score += 1
+            self.wait_time_score -= TIME_SCORE
+            
 
         for rock in self.rock_list:
             rock.update(delta)
-            if rock.center_x <= 0 or rock.center_y <= 0 or rock.center_x >= self.width or rock.center_y >= self.height:
-                self.rock_list.remove(rock)
-                
+
+        for spider in self.spider_list:
+            spider.update(delta)
+
+            for rock in self.rock_list:
+                if rock.center_x <= 0 or rock.center_y <= 0 or rock.center_x >= self.width or rock.center_y >= self.height:
+                    self.rock_list.remove(rock)
+                if arcade.geometry.check_for_collision(spider,rock):
+                    self.rock_list.remove(rock)
+                    self.spider_list.remove(spider)
+                    self.score += 10
+
+            if spider.center_y <= 0:
+                self.spider_list.remove(spider)
+
+            if arcade.geometry.check_for_collision(spider,self.human_main_hit):
+                arcade.window_commands.close_window()
 
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.UP:

@@ -1,14 +1,15 @@
 import arcade
 import math
+from random import sample
 
 HUMAN_MOVE_LENGTH = 5
 PILLAR_FARTHUR = 150 #the Range between a pillar to a pillar
 SPIDER_MOVE = 2
 
+BIRD_MOVE = 3
+
 VELOCITY = 10
 GRAVITY = 9.8
-ANGULAR_TRI = ((math.sqrt(2))/2)
-
 
 class Human(arcade.Sprite):
     def setup(self, world, x, y):
@@ -49,10 +50,20 @@ class Rock(arcade.Sprite):
 
     def update(self, delta):
         self.center_x += VELOCITY*(self.z)
-        #self.center_y -= VELOCITY*ANGULAR_TRI
+        self.center_y -= (VELOCITY*(delta+0.1))+(0.5*9.8*((delta+0.1)*(delta+0.1)))
 
-
-class Spider_Enemy_Hit(arcade.Sprite):
+class Bird_Enemy(arcade.Sprite):
+    def setup(self, wrold, x, y):
+        self.center_x = x
+        self.center_y = y
+        self.bird_move_list = [-BIRD_MOVE, BIRD_MOVE]
+    
+    def update(self, delta):
+        self.center_x += sample(bird_move_list, 1)
+        self.center_y += sample(bird_move_list, 1)
+        
+class Get_Hit(arcade.Sprite):
     def setup(self, would, x, y):
         self.center_x = x
         self.center_y = y
+    
