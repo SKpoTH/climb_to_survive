@@ -2,8 +2,8 @@ import arcade
 import pyglet
 from world import World
 
-SCREEN_HEIGHT = 600
-SCREEN_WIDTH = 900
+SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 1260
 
 PILLAR_SCALE = 0.6
 HUMAN_SCALE = 0.2
@@ -23,12 +23,16 @@ class PillSurWindow(arcade.Window):
         self.world.pillar3.draw()
         self.world.pillar4.draw()
         self.world.pillar5.draw()
+        self.world.pillar6.draw()
 
         self.world.human_main.draw()
         self.world.human_main_hit.draw()
         
         for spider in self.world.spider_list:
             spider.draw()
+
+        for bird in self.world.bird_list:
+            bird.draw()
 
         for rock in self.world.rock_list:
             rock.draw()
