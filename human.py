@@ -41,6 +41,15 @@ class Human(arcade.Sprite):
                 self.previous_pillar = PILLAR_FARTHUR
                 self.run_time = 0
 
+        #Player die and fall down
+        if self.world.player_is_dead:
+            self.run_time += delta
+            self.center_y -= (2*VELOCITY*(self.run_time))+(0.5*9.8*((self.run_time)*(self.run_time)))
+            if self.center_y <= -100:
+                self.world.game_state = 2
+                self.world.player_is_dead = False
+                self.run_time = 0
+
         #Block player to not go outside playing area
         if self.center_y >= self.world.height or self.center_y <= 0:
             self.change_y = 0

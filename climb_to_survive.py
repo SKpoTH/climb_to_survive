@@ -1,5 +1,6 @@
 import arcade
 import pyglet
+
 from world import World
 from decorate import Decorate
 
@@ -13,7 +14,7 @@ SPIDER_SCALE = 0.2
 class PillSurWindow(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height)
- 
+
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
 
         self.decorate = Decorate(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -24,6 +25,15 @@ class PillSurWindow(arcade.Window):
         self.game_over = arcade.load_texture("images/game_over.png")
 
         self.tutorial = arcade.load_texture("images/tutorial_screen.png")
+
+        #Get high score from text file
+        self.get_score = open("high_score.txt","r")
+        self.high_score = int(self.get_score.read())
+        self.get_score.close()
+
+        #Add sounds
+        self.theme_song = arcade.sound.load_sound('sounds/Darude-Sandstorm.mp3')
+        arcade.sound.play_sound(self.theme_song)
 
     def on_draw(self):
         arcade.start_render()
@@ -37,10 +47,6 @@ class PillSurWindow(arcade.Window):
         self.world.pillar4.draw()
         self.world.pillar5.draw()
         self.world.pillar6.draw()
-
-        #Loading
-        #if self.world.game_state == 0.5:
-
             
         #Play Screen
         if self.world.game_state == 1:
@@ -57,7 +63,7 @@ class PillSurWindow(arcade.Window):
                 rock.draw()
 
             show_score = 'Score: ' + str(self.world.score)
-            arcade.draw_text(show_score, 10, SCREEN_HEIGHT-20, arcade.color.BLACK, 16)
+            arcade.draw_text(show_score, 10, SCREEN_HEIGHT-20, arcade.color.BLACK, 20)
 
         for cloud in self.decorate.cloud_list:
             cloud.draw()
@@ -99,7 +105,13 @@ class PillSurWindow(arcade.Window):
             arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2)+30,
                                       800, 600, self.game_over)
             
-            arcade.draw_text('"'+str(self.world.score)+'"', 420, 400, 
+            if self.world.score > self.high_score:
+                self.high_score = self.world.score
+                self.get_score = open("high_score.txt","w")
+                self.get_score.write(str(self.high_score))
+                self.get_score.close()
+
+            arcade.draw_text('"'+str(self.high_score)+'"', 420, 400, 
                             arcade.color.WHITE, 30, 
                             align="center", 
                             anchor_x="center", 

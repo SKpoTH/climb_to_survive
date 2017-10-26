@@ -3,7 +3,7 @@ import arcade
 BIRD_MOVE = 3
 
 VELOCITY_X = 2
-VELOCITY_Y = 20
+VELOCITY_Y = 10
 GRAVITY = 9.8
 
 class Bird_Enemy(arcade.Sprite):

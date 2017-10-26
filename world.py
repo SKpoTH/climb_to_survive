@@ -21,9 +21,9 @@ ROCK_SCALE = 0.1
 
 TIME_SCORE = 0.2
 
-MOVE_RATE = 0.5
+MOVE_RATE = 0.2
 
-SPAWN_RATE = 0.1
+SPAWN_RATE = 0.05
 
 NEXT_LEVEL_MULTI = 1.2
 
@@ -87,6 +87,8 @@ class World:
         self.human_main.setup(self, PILLAR_FARTHUR*3, self.height/2)
         self.human_main_hit = Get_Hit('images/spider_enemy_hitblock.png', HIT_SCALE)
 
+        self.player_is_dead = False
+
         #Set monster in group for append or remove
         self.spider_list = []
         self.bird_list = []
@@ -109,7 +111,14 @@ class World:
             self.spider_move = 2
             self.bird_move = 1.5
 
+            self.bird_spawn_time = 1.0
+            self.spider_spawn_time = 1.0
+
+            self.spawn_rate = 1.0
+
             self.human_main.setup(self, PILLAR_FARTHUR*3, self.height/2)
+
+            self.is_pillar_move = 0
 
         if self.game_state == 1:
             self.human_main.update(delta)
@@ -190,7 +199,7 @@ class World:
                     self.bird_list.remove(bird)
 
                 if arcade.geometry.check_for_collision(bird, self.human_main_hit):
-                    self.game_state = 2
+                    self.player_is_dead = True
 
             #Spider Action
             for spider in self.spider_list:
@@ -208,7 +217,7 @@ class World:
                     self.spider_list.remove(spider)
 
                 if arcade.geometry.check_for_collision(spider,self.human_main_hit):
-                    self.game_state = 2
+                    self.player_is_dead = True
 
         elif self.game_state == 2:
 
@@ -235,34 +244,34 @@ class World:
                     self.bird_list.remove(bird)
 
     def on_key_press(self, key, key_modifiers):
-        if key == arcade.key.UP:
+        if key == arcade.key.UP and (not self.player_is_dead):
             self.human_main.change_y = HUMAN_MOVE_LENGTH
             if self.human_main.center_y >= self.height:
                 self.human_main.change_y = 0
         #If state below key I place for blocking player to spam key and player can go out
 
-        if key == arcade.key.DOWN:
+        if key == arcade.key.DOWN and (not self.player_is_dead):  
             self.human_main.change_y = -HUMAN_MOVE_LENGTH
             if self.human_main.center_y <= 0:
                 self.human_main.change_y = 0
 
-        if key == arcade.key.LEFT:
+        if key == arcade.key.LEFT and (not self.player_is_dead) and self.is_pillar_move == 0:
             self.is_pillar_move = -1
             if self.human_main.center_x <= PILLAR_FARTHUR*1:
                 self.human_main.center_x -= 0
 
-        if key == arcade.key.RIGHT:
+        if key == arcade.key.RIGHT and (not self.player_is_dead) and self.is_pillar_move == 0:
             self.is_pillar_move = 1
             if self.human_main.center_x >= PILLAR_FARTHUR*5:
                 self.human_main.center_x += 0
 
         #Throw Rock
-        if key == arcade.key.Z and len(self.rock_list) <= 2:
+        if key == arcade.key.Z and (not self.player_is_dead) and len(self.rock_list) <= 2:
             self.rock = Rock('images/rock_model.png', ROCK_SCALE)
             self.rock.setup(self, self.human_main.center_x, self.human_main.center_y, -1)
             self.rock_list.append(self.rock)
 
-        if key == arcade.key.X and len(self.rock_list) <= 2:
+        if key == arcade.key.X and (not self.player_is_dead) and len(self.rock_list) <= 2:
             self.rock = Rock('images/rock_model.png', ROCK_SCALE)
             self.rock.setup(self, self.human_main.center_x, self.human_main.center_y, 1)
             self.rock_list.append(self.rock)
