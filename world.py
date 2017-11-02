@@ -23,9 +23,9 @@ TIME_SCORE = 0.2
 
 MOVE_RATE = 0.2
 
-SPAWN_RATE = 0.05
+SPAWN_RATE = 0.07
 
-NEXT_LEVEL_MULTI = 1.2
+NEXT_LEVEL_MULTI = 1.15
 
 class World:
     def __init__(self, width, height):
